@@ -1,12 +1,9 @@
-# Etapa de build
-FROM ghcr.io/graalvm/graalvm-community:21 AS builder
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY . .
-RUN ./gradlew nativeCompile
+RUN ./gradlew clean build -x test
 
-# Etapa final: só o binário
-FROM ubuntu:22.04
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=builder /app/build/native/nativeCompile/products-catalog .
-EXPOSE 8080
-CMD ["./products-catalog"]
+COPY --from=build /app/build/libs/products-catalog-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]

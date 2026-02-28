@@ -9,12 +9,27 @@ group = 'com.avocato'
 version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
-//java {
-//	toolchain {
-//		languageVersion = JavaLanguageVersion.of(21)
-//	}
-//}
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
 
+graalvmNative {
+	binaries {
+		named("main") {
+			buildArgs.addAll(
+					"--parallelism=2",
+					"-J-Xmx3500m",
+					"-J-Xms1g",
+					"-Ob",
+					"--gc=serial",
+					"--no-fallback",
+					"-H:+UnlockExperimentalVMOptions"
+			)
+		}
+	}
+}
 repositories {
 	mavenCentral()
 	maven { url = 'https://repo.spring.io/snapshot' }
@@ -22,6 +37,11 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+	implementation 'org.postgresql:postgresql'
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
